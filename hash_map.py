@@ -1,7 +1,7 @@
 # Course: CS261 - Data Structures
 # Assignment: 5
-# Student:
-# Description:
+# Student: Timothy Pham
+# Description: Hash Map Implementation
 
 
 # Import pre-written DynamicArray and LinkedList classes
@@ -58,57 +58,119 @@ class HashMap:
 
     def clear(self) -> None:
         """
-        TODO: Write this implementation
+        clears the content of the hash map
         """
-        pass
+        new_da = DynamicArray()
+        for spots in range(self.capacity):
+            new_da.append(LinkedList())
+        self.buckets = new_da
+        self.size = 0
 
     def get(self, key: str) -> object:
         """
-        TODO: Write this implementation
+        returns the value associated with the given key. Returns None if the
+        key is not in the hash map.
         """
-        return None
+        hash_key = self.hash_function(key)
+        index = hash_key % self.capacity
+        key_node = self.buckets.get_at_index(index).contains(key)
+        if key_node is None:
+            return None
+        return key_node.value
 
     def put(self, key: str, value: object) -> None:
         """
-        TODO: Write this implementation
+        updates the key / value pair in the hash map. If a given key already
+        exists in the hash map, its associated value should be replaced with
+        the new value. If a given key is not in the hash map, a key / value
+        pair should be added.
         """
-        pass
+        hash_key = self.hash_function(key)
+        index = hash_key % self.capacity
+        if self.buckets.get_at_index(index).contains(key) is not None:
+            index = self.buckets.get_at_index(index).contains(key)
+            index.value = value
+        elif self.buckets.get_at_index(index).contains(key) is None:
+            self.buckets.get_at_index(index).insert(key, value)
+            self.size += 1
 
     def remove(self, key: str) -> None:
         """
-        TODO: Write this implementation
+        removes the given key and its associated value from the hash map. If
+        a given key is not in the hash map, the method does nothing (no
+        exception needs to be raised).
         """
-        pass
+        hash_key = self.hash_function(key)
+        index = hash_key % self.capacity
+        return_bool = self.buckets.get_at_index(index).remove(key)
+        if return_bool is True:
+            self.size -= 1
+        return
 
     def contains_key(self, key: str) -> bool:
         """
-        TODO: Write this implementation
+        returns True if the given key is in the hash map, otherwise it returns
+        False. An empty hash map does not contain any keys.
         """
-        return False
+        hash_key = self.hash_function(key)
+        index = hash_key % self.capacity
+        key_node = self.buckets.get_at_index(index).contains(key)
+        if key_node is None:
+            return False
+        return True
 
     def empty_buckets(self) -> int:
         """
-        TODO: Write this implementation
+        returns a number of empty buckets in the hash table
         """
-        return 0
+        count_buckets = 0
+
+        for index in range(self.buckets.length()):
+            if self.buckets.get_at_index(index).head is None:
+                count_buckets += 1
+        return count_buckets
 
     def table_load(self) -> float:
         """
-        TODO: Write this implementation
+        returns the current hash table load factor
         """
-        return 0.0
+        return self.size/self.capacity
 
     def resize_table(self, new_capacity: int) -> None:
         """
-        TODO: Write this implementation
+        changes the capacity of the internal hash table. All existing key /
+        value pairs must remain in the new hash map and all hash table links
+        must be rehashed. If new_capacity is less than 1, this method should
+        do nothing.
         """
-        pass
+        old_capacity = self.capacity
+        new_da = DynamicArray()
+        for spots in range(new_capacity):
+            new_da.append(LinkedList())
+        for key in range(old_capacity):
+            if self.buckets.get_at_index(key).head is not None:
+                current = self.buckets.get_at_index(key).head
+                while current is not None:
+                    key_hash = self.hash_function(current.key)
+                    index = key_hash % new_capacity
+                    new_da.get_at_index(index).insert(current.key, current.value)
+                    current = current.next
+        self.capacity = new_capacity
+        self.buckets = new_da
 
     def get_keys(self) -> DynamicArray:
         """
-        TODO: Write this implementation
+        returns a DynamicArray that contains all keys stored in your hash map.
+        The order of the keys in the DA does not matter
         """
-        return DynamicArray()
+        new_da = DynamicArray()
+        for hash in range(self.capacity):
+            if self.buckets.get_at_index(hash).head is not None:
+                current = self.buckets.get_at_index(hash).head
+                while current is not None:
+                    new_da.append(current.key)
+                    current = current.next
+        return new_da
 
 
 # BASIC TESTING
@@ -136,7 +198,6 @@ if __name__ == "__main__":
         if i % 30 == 0:
             print(m.empty_buckets(), m.size, m.capacity)
 
-
     print("\nPDF - table_load example 1")
     print("--------------------------")
     m = HashMap(100, hash_function_1)
@@ -147,7 +208,6 @@ if __name__ == "__main__":
     print(m.table_load())
     m.put('key1', 30)
     print(m.table_load())
-
 
     print("\nPDF - table_load example 2")
     print("--------------------------")
@@ -182,7 +242,6 @@ if __name__ == "__main__":
     m.clear()
     print(m.size, m.capacity)
 
-
     print("\nPDF - put example 1")
     print("-------------------")
     m = HashMap(50, hash_function_1)
@@ -191,7 +250,6 @@ if __name__ == "__main__":
         if i % 25 == 24:
             print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
 
-
     print("\nPDF - put example 2")
     print("-------------------")
     m = HashMap(40, hash_function_2)
@@ -199,7 +257,6 @@ if __name__ == "__main__":
         m.put('str' + str(i // 3), i * 100)
         if i % 10 == 9:
             print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
-
 
     print("\nPDF - contains_key example 1")
     print("----------------------------")
