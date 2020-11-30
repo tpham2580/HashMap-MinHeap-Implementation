@@ -1,7 +1,7 @@
 # Course: CS261 - Data Structures
 # Assignment: 5
-# Student:
-# Description:
+# Student: Timothy Pham
+# Description: MinHeap Implementation using Dynamic Array
 
 
 # Import pre-written DynamicArray and LinkedList classes
@@ -46,21 +46,76 @@ class MinHeap:
 
     def add(self, node: object) -> None:
         """
-        TODO: Write this implementation
+        adds a new object to the MinHeap maintaining heap property
+        Runtime complexity of this implementation must be O(logN).
         """
-        pass
+        self.heap.append(node)
+        # getting the length should be O(1) since we are using the __len__ built in
+        current_index = self.heap.length() - 1
+        current = self.heap.get_at_index(current_index)
+        if (current_index - 1) // 2 < 0:
+            parent_index = 0
+        else:
+            parent_index = (current_index - 1) // 2
+        parent = self.heap.get_at_index(parent_index)
+        while current < parent:
+            self.heap.swap(current_index, parent_index)
+            current_index = parent_index
+            current = self.heap.get_at_index(current_index)
+            if (current_index - 1) // 2 < 0:
+                parent_index = 0
+            else:
+                parent_index = (current_index - 1) // 2
+            parent = self.heap.get_at_index(parent_index)
 
     def get_min(self) -> object:
         """
-        TODO: Write this implementation
+        returns an object with a minimum key without removing it from
+        the heap. If the heap is empty, the method raises a MinHeapException.
+        Runtime complexity of this implementation is O(1).
         """
-        return None
+        if self.is_empty():
+            raise MinHeapException
+        return self.heap.get_at_index(0)
 
     def remove_min(self) -> object:
         """
-        TODO: Write this implementation
+        This method returns an object with a minimum key and removes it from
+        the heap. If the heap is empty, the method raises a MinHeapException.
+        Runtime complexity of this implementation must be O(logN).
         """
-        return None
+        last_item_index = self.heap.length() - 1
+
+        # swapping minimum with last item in DA
+        self.heap.swap(0, last_item_index)
+
+        # deleting last item and popping it
+        min_item = self.heap.pop()
+        print(min_item)
+
+        current_index = 0
+        current = self.heap.get_at_index(current_index)
+
+        # finding minimum value child
+        if (2 * current_index) + 1 > self.heap.length() - 1:
+            return min_item
+        if self.heap.get_at_index((2 * current_index) + 1) < self.heap.get_at_index((2 * current_index) + 2):
+            next_index = (2 * current_index) + 1
+        else:
+            next_index = (2 * current_index) + 2
+        while current > self.heap.get_at_index(next_index):
+            self.heap.swap(current_index, next_index)
+            current_index = next_index
+            current = self.heap.get_at_index(current_index)
+            if (2 * current_index) + 1 > self.heap.length()-1:
+                return min_item
+            else:
+                if self.heap.get_at_index((2 * current_index) + 1) < self.heap.get_at_index((2 * current_index) + 2):
+                    next_index = (2 * current_index) + 1
+                else:
+                    next_index = (2 * current_index) + 2
+
+        return min_item
 
     def build_heap(self, da: DynamicArray) -> None:
         """
@@ -103,7 +158,7 @@ if __name__ == '__main__':
         print(h, end=' ')
         print(h.remove_min())
 
-
+    """
     print("\nPDF - build_heap example 1")
     print("--------------------------")
     da = DynamicArray([100, 20, 6, 200, 90, 150, 300])
@@ -114,3 +169,4 @@ if __name__ == '__main__':
     da.set_at_index(0, 500)
     print(da)
     print(h)
+"""
