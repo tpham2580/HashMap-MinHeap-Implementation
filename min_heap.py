@@ -78,12 +78,37 @@ class MinHeap:
             raise MinHeapException
         return self.heap.get_at_index(0)
 
+    def _heapify(self, array, index, loop=1):
+        """helper function to recursively find the smallest value"""
+
+        smallest = index
+
+        # setting the children
+        left = 2 * index + 1
+        right = 2 * index + 2
+
+        # when the left child is smaller than parent
+        if left < array.length() and array[left] < array[smallest]:
+            smallest = left
+
+        # when the right child is smaller than parent
+        if right < array.length() and array[right] < array[smallest]:
+            smallest = right
+
+        if smallest != index:
+            array.swap(index, smallest)
+            self._heapify(array, smallest, loop + 1)
+
     def remove_min(self) -> object:
         """
         This method returns an object with a minimum key and removes it from
         the heap. If the heap is empty, the method raises a MinHeapException.
         Runtime complexity of this implementation must be O(logN).
         """
+
+        if self.is_empty():
+            raise MinHeapException
+
         last_item_index = self.heap.length() - 1
 
         # swapping minimum with last item in DA
@@ -91,37 +116,32 @@ class MinHeap:
 
         # deleting last item and popping it
         min_item = self.heap.pop()
-        print(min_item)
 
+        # if empty after pop()
+        if self.is_empty():
+            return min_item
         current_index = 0
-        current = self.heap.get_at_index(current_index)
 
         # finding minimum value child
-        if (2 * current_index) + 1 > self.heap.length() - 1:
-            return min_item
-        if self.heap.get_at_index((2 * current_index) + 1) < self.heap.get_at_index((2 * current_index) + 2):
-            next_index = (2 * current_index) + 1
-        else:
-            next_index = (2 * current_index) + 2
-        while current > self.heap.get_at_index(next_index):
-            self.heap.swap(current_index, next_index)
-            current_index = next_index
-            current = self.heap.get_at_index(current_index)
-            if (2 * current_index) + 1 > self.heap.length()-1:
-                return min_item
-            else:
-                if self.heap.get_at_index((2 * current_index) + 1) < self.heap.get_at_index((2 * current_index) + 2):
-                    next_index = (2 * current_index) + 1
-                else:
-                    next_index = (2 * current_index) + 2
+        self._heapify(self.heap, current_index)
 
         return min_item
 
     def build_heap(self, da: DynamicArray) -> None:
         """
-        TODO: Write this implementation
+        receives a dynamic array with objects in any order and builds a
+        proper MinHeap from them. Current content of the MinHeap is lost.
+        Runtime complexity of this implementation must be O(N).
         """
-        pass
+        new_heap = DynamicArray()
+        for index in range(da.length()):
+            new_heap.append(da[index])
+
+        for index in range(new_heap.length() // 2 - 1, -1, -1):
+            self._heapify(new_heap, index)
+
+        self.heap = new_heap
+        return
 
 
 # BASIC TESTING
@@ -143,13 +163,11 @@ if __name__ == '__main__':
         h.add(value)
         print(h)
 
-
     print("\nPDF - get_min example 1")
     print("-----------------------")
     h = MinHeap(['fish', 'bird'])
     print(h)
     print(h.get_min(), h.get_min())
-
 
     print("\nPDF - remove_min example 1")
     print("--------------------------")
@@ -158,7 +176,6 @@ if __name__ == '__main__':
         print(h, end=' ')
         print(h.remove_min())
 
-    """
     print("\nPDF - build_heap example 1")
     print("--------------------------")
     da = DynamicArray([100, 20, 6, 200, 90, 150, 300])
@@ -169,4 +186,3 @@ if __name__ == '__main__':
     da.set_at_index(0, 500)
     print(da)
     print(h)
-"""

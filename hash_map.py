@@ -143,6 +143,10 @@ class HashMap:
         must be rehashed. If new_capacity is less than 1, this method should
         do nothing.
         """
+
+        if new_capacity < 1:
+            return None
+
         old_capacity = self.capacity
         new_da = DynamicArray()
         for spots in range(new_capacity):
